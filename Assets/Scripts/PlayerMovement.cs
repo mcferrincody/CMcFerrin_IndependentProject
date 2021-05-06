@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
         m_Rigidbody = GetComponent<Rigidbody> ();
         m_AudioSource = GetComponent<AudioSource> ();
     }
-
+    // You said to include a comment. So, here you go!
     void FixedUpdate ()
     {
         float horizontal = Input.GetAxis ("Horizontal");
