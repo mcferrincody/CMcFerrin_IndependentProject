@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         m_GameEnding = GameObject.Find("GameEnding").GetComponent<GameEnding>();
-        InvokeRepeating("SpawnSpider", 2.0f, 5.0f);
+        InvokeRepeating("SpawnSpider", 1.5f, 2.0f);
     }
 
     // Update is called once per frame
