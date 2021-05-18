@@ -11,17 +11,20 @@ public class PlayerMovement : MonoBehaviour
     AudioSource m_AudioSource;
     Vector3 m_Movement;
     Quaternion m_Rotation = Quaternion.identity;
+    GameManager m_GameManager;
 
     void Start ()
     {
         m_Animator = GetComponent<Animator> ();
         m_Rigidbody = GetComponent<Rigidbody> ();
         m_AudioSource = GetComponent<AudioSource> ();
+        m_GameManager = GameObject.Find("Game Manager").GetComponent<GameManager> ();
     }
-    // You said to include a comment. So, here you go!
     void FixedUpdate ()
     {
+        //Getting the horizontal input movement from the user
         float horizontal = Input.GetAxis ("Horizontal");
+        //Getting the vertical input movement from the user
         float vertical = Input.GetAxis ("Vertical");
         
         m_Movement.Set(horizontal, 0f, vertical);
@@ -48,9 +51,14 @@ public class PlayerMovement : MonoBehaviour
         m_Rotation = Quaternion.LookRotation (desiredForward);
     }
 
-    void OnAnimatorMove ()
+    void OnAnimatorMove()
     {
-        m_Rigidbody.MovePosition (m_Rigidbody.position + m_Movement * m_Animator.deltaPosition.magnitude);
-        m_Rigidbody.MoveRotation (m_Rotation);
+        if (m_GameManager.gameActive)
+        {
+            //Using animations to move playerRigidbody position
+            m_Rigidbody.MovePosition(m_Rigidbody.position + m_Movement * m_Animator.deltaPosition.magnitude);
+            //Using animations to rotate player Rigidbody
+            m_Rigidbody.MoveRotation(m_Rotation);
+        }
     }
 }
