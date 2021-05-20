@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public GameObject spider_pref;
     public bool gameActive = true;
     GameEnding m_GameEnding;
+    GameEnding m_IsPlayerAtExit;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void SpawnSpider()
     {
-        if (gameActive)
+        while (gameActive)
         {
             Instantiate(spider_pref);
         }
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviour
     public void LoseGame()
     {
         m_GameEnding.CaughtPlayer();
+        m_IsPlayerAtExit.CaughtPlayer();
         gameActive = false;
         Debug.Log("Lose Game");
     }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float turnSpeed = 20f;
+    public ParticleSystem dirtSystem;
 
     Animator m_Animator;
     Rigidbody m_Rigidbody;
@@ -40,11 +41,13 @@ public class PlayerMovement : MonoBehaviour
             if (!m_AudioSource.isPlaying)
             {
                 m_AudioSource.Play();
+                dirtSystem.Play();
             }
         }
         else
         {
             m_AudioSource.Stop ();
+            dirtSystem.Stop();
         }
 
         Vector3 desiredForward = Vector3.RotateTowards (transform.forward, m_Movement, turnSpeed * Time.deltaTime, 0f);
