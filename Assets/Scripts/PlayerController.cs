@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     public float turnSpeed = 20f;
     public ParticleSystem dirtSystem;
+    public bool gameOver = false;
+    bool hasPowerUp = false;
 
     Animator m_Animator;
     Rigidbody m_Rigidbody;
@@ -62,6 +64,21 @@ public class PlayerMovement : MonoBehaviour
             m_Rigidbody.MovePosition(m_Rigidbody.position + m_Movement * m_Animator.deltaPosition.magnitude);
             //Using animations to rotate player Rigidbody
             m_Rigidbody.MoveRotation(m_Rotation);
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("PowerUp"))
+        {
+            hasPowerUp = true;
+            Destroy(other.gameObject);
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            gameOver = true;
         }
     }
 }

@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExaggeratedFoilage : MonoBehaviour
+public class DogramPlant : MonoBehaviour
 {
     public float speed = 3.0f;
-    // Start is called before the first frame update
+    private PlayerController playerCtrl;
     void Start()
     {
-
+        playerCtrl = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (playerCtrl.gameOver == false)
+        {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
+        }
     }
 }

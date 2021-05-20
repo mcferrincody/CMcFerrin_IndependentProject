@@ -4,29 +4,26 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject spider_pref;
+    public GameObject spider_pref, spyder2, spy3;
     public bool gameActive = true;
-    GameEnding m_GameEnding;
-    GameEnding m_IsPlayerAtExit;
     // Start is called before the first frame update
     void Start()
     {
-        m_GameEnding = GameObject.Find("GameEnding").GetComponent<GameEnding>();
-        InvokeRepeating("SpawnSpider", 1.5f, 2.0f);
+        InvokeRepeating("SpawnSpider", 1.0f, 2.0f);
     }
 
     // Update is called once per frame
     void SpawnSpider()
     {
-        while (gameActive)
+        if (gameActive)
         {
             Instantiate(spider_pref);
+            Instantiate(spyder2);
+            Instantiate(spy3);
         }
     }
     public void LoseGame()
     {
-        m_GameEnding.CaughtPlayer();
-        m_IsPlayerAtExit.CaughtPlayer();
         gameActive = false;
         Debug.Log("Lose Game");
     }

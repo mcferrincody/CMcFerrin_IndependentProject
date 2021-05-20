@@ -6,19 +6,26 @@ public class SpawnManager : MonoBehaviour
 {
     public GameObject[] dogramPlant;
     private float zPosRange = 15;
-    // Start is called before the first frame update
+    public bool gameActive = true;
     void Start()
     {
-        InvokeRepeating("SpawnRandomdogramPlant", 0f, 5.0f);
+        InvokeRepeating("SpawnRandomdogramPlant", 0f, 0.5f);
     }
 
-    // Update is called once per frame
     void SpawnRandomdogramPlant()
+
     {
+        if (gameActive)
+        {
             float randZPos = Random.Range(-zPosRange, zPosRange);
             int dogramPlantIndex = Random.Range(0, dogramPlant.Length);
             Vector3 randPos = new Vector3(10, 2, randZPos);
             Instantiate(dogramPlant[dogramPlantIndex], randPos,
                 dogramPlant[dogramPlantIndex].transform.rotation);
+        }
+    }
+    public void LoseGame()
+    {
+        gameActive = false;
     }
 }
