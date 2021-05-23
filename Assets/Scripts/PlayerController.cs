@@ -6,59 +6,74 @@ public class PlayerController : MonoBehaviour
 {
     public float turnSpeed = 20f;
     public ParticleSystem dirtSystem;
-    public bool gameOver = false;
+    public GameObject PowerUpInd;
+    bool hasCandy = false;
     bool hasPowerUp = false;
+    public float powerUpSpeed = 20.0f;
+
+    public int pointValue = 1;
+    public ParticleSystem expParticle;
 
     Animator m_Animator;
     Rigidbody m_Rigidbody;
     AudioSource m_AudioSource;
     Vector3 m_Movement;
     Quaternion m_Rotation = Quaternion.identity;
-    GameManager m_GameManager;
+    GameManager gameManager;
 
-    void Start ()
+    void Start()
     {
-        m_Animator = GetComponent<Animator> ();
-        m_Rigidbody = GetComponent<Rigidbody> ();
-        m_AudioSource = GetComponent<AudioSource> ();
-        m_GameManager = GameObject.Find("Game Manager").GetComponent<GameManager> ();
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        m_Animator = GetComponent<Animator>();
+        m_Rigidbody = GetComponent<Rigidbody>();
+        m_AudioSource = GetComponent<AudioSource>();
     }
-    void FixedUpdate ()
+    void FixedUpdate()
     {
-        //Getting the horizontal input movement from the user
-        float horizontal = Input.GetAxis ("Horizontal");
-        //Getting the vertical input movement from the user
-        float vertical = Input.GetAxis ("Vertical");
-        
-        m_Movement.Set(horizontal, 0f, vertical);
-        m_Movement.Normalize ();
-
-        bool hasHorizontalInput = !Mathf.Approximately (horizontal, 0f);
-        bool hasVerticalInput = !Mathf.Approximately (vertical, 0f);
-        bool isWalking = hasHorizontalInput || hasVerticalInput;
-        m_Animator.SetBool ("IsWalking", isWalking);
-        
-        if (isWalking)
+        if (gameManager.gameActive)
         {
-            if (!m_AudioSource.isPlaying)
+            m_Animator.enabled = true;
+            //Getting the horizontal input movement from the user
+            float horizontal = Input.GetAxis("Horizontal");
+            //Getting the vertical input movement from the user
+            float vertical = Input.GetAxis("Vertical");
+
+            m_Movement.Set(horizontal, 0f, vertical);
+            m_Movement.Normalize();
+
+            bool hasHorizontalInput = !Mathf.Approximately(horizontal, 0f);
+            bool hasVerticalInput = !Mathf.Approximately(vertical, 0f);
+            bool isWalking = hasHorizontalInput || hasVerticalInput;
+            m_Animator.SetBool("IsWalking", isWalking);
+
+            if (isWalking)
             {
-                m_AudioSource.Play();
-                dirtSystem.Play();
+                if (!m_AudioSource.isPlaying)
+                {
+                    m_AudioSource.Play();
+                    dirtSystem.Play();
+                }
             }
+            else
+            {
+                m_AudioSource.Stop();
+                dirtSystem.Stop();
+            }
+
+            Vector3 desiredForward = Vector3.RotateTowards(transform.forward, m_Movement, turnSpeed * Time.deltaTime, 0f);
+            m_Rotation = Quaternion.LookRotation(desiredForward);
         }
         else
         {
-            m_AudioSource.Stop ();
+            m_AudioSource.Stop();
             dirtSystem.Stop();
+            m_Animator.enabled = false;
         }
-
-        Vector3 desiredForward = Vector3.RotateTowards (transform.forward, m_Movement, turnSpeed * Time.deltaTime, 0f);
-        m_Rotation = Quaternion.LookRotation (desiredForward);
     }
 
     void OnAnimatorMove()
     {
-        if (m_GameManager.gameActive)
+        if (gameManager.gameActive)
         {
             //Using animations to move playerRigidbody position
             m_Rigidbody.MovePosition(m_Rigidbody.position + m_Movement * m_Animator.deltaPosition.magnitude);
@@ -68,17 +83,32 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("PowerUp"))
+        if (other.CompareTag("Power Up"))
         {
             hasPowerUp = true;
+            StartCoroutine(PowerUpCountdown());
+            PowerUpInd.SetActive(true);
+            Destroy(other.gameObject);
+        }
+        if (other.CompareTag("Candy"))
+        {
+            Debug.Log("Candy player");
+            gameManager.UpdateScore(pointValue);
+            Destroy(other.gameObject);
+            Instantiate(expParticle, transform.position, expParticle.transform.rotation);
+
+        }
+        if (hasPowerUp && other.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("Player has collid with" + other.gameObject + "with powerup set to " + hasPowerUp);
+            Rigidbody rbEnemy = other.gameObject.GetComponent<Rigidbody>();
             Destroy(other.gameObject);
         }
     }
-    private void OnCollisionEnter(Collision collision)
+    IEnumerator PowerUpCountdown()
     {
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            gameOver = true;
-        }
+        yield return new WaitForSeconds(5);
+        hasPowerUp = false;
+        PowerUpInd.SetActive(false);
     }
 }

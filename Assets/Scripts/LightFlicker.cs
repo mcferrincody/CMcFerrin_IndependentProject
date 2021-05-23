@@ -20,6 +20,7 @@ public class LightFlicker : MonoBehaviour
     public float lightIntensityMax = 2.25f;
     public float flickerDuration = 0.075f;
     public AnimationCurve intensityCurve;
+    GameManager gameManager;
 
     Material m_FlickeringMaterial;
     Color m_EmissionColor;
@@ -34,6 +35,7 @@ public class LightFlicker : MonoBehaviour
 
     void Start()
     {
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
         m_FlickeringMaterial = flickeringRenderer.material;
         m_FlickeringMaterial.EnableKeyword(k_EmissionName);
         m_EmissionColor = m_FlickeringMaterial.GetColor(k_EmissionColorID);
@@ -41,22 +43,25 @@ public class LightFlicker : MonoBehaviour
 
     void Update()
     {
-        m_Timer += Time.deltaTime;
+        if (gameManager.gameActive)
+        {
+            m_Timer += Time.deltaTime;
 
-        if (flickerMode == FlickerMode.Random)
-        {
-            if (m_Timer >= flickerDuration)
+            if (flickerMode == FlickerMode.Random)
             {
-                ChangeRandomFlickerLightIntensity ();
+                if (m_Timer >= flickerDuration)
+                {
+                    ChangeRandomFlickerLightIntensity();
+                }
             }
+            else if (flickerMode == FlickerMode.AnimationCurve)
+            {
+                ChangeAnimatedFlickerLightIntensity();
+            }
+
+            flickeringLight.intensity = m_FlickerLightIntensity;
+            m_FlickeringMaterial.SetColor(k_EmissionColorID, m_EmissionColor * m_FlickerLightIntensity * k_LightIntensityToEmission);
         }
-        else if(flickerMode == FlickerMode.AnimationCurve)
-        {
-            ChangeAnimatedFlickerLightIntensity ();
-        }
-            
-        flickeringLight.intensity = m_FlickerLightIntensity;
-        m_FlickeringMaterial.SetColor (k_EmissionColorID, m_EmissionColor * m_FlickerLightIntensity * k_LightIntensityToEmission);
     }
 
     void ChangeRandomFlickerLightIntensity ()
